@@ -8,11 +8,23 @@
     <script src="https://cdn.tailwindcss.com"></script> <!-- Tailwind CDN -->
 </head>
 <body class="bg-gray-100">
-    @include('layouts.appLayout')
+    {{-- Include the user navbar only if the user is logged in --}}
+    @if(Auth::check())
+        @include('layouts.customerNavbar') <!-- Adjust the path as necessary -->
+    @else
+        @include('layouts.appLayout') <!-- Include a guest navbar or layout -->
+    @endif
 
     <div class="container mx-auto p-8">
         <h2 class="text-3xl font-bold mb-6 text-gray-800">Shopping Cart</h2>
-    
+
+        <!-- Display Error Messages -->
+        @if(session('error'))
+            <div class="bg-red-500 text-white p-4 rounded mb-4">
+                {{ session('error') }}
+            </div>
+        @endif
+
         @if(session('cart') && count(session('cart')) > 0)
             <div class="bg-white shadow-md rounded-lg overflow-hidden">
                 <table class="min-w-full bg-white">
@@ -59,10 +71,9 @@
                     <strong class="text-xl text-gray-900">Total: ${{ array_sum(array_map(function($item) {
                         return $item['price'] * $item['quantity'];
                     }, session('cart'))) }}</strong>
-                    {{-- <form action="{{ route('cart.clear') }}" method="POST"> --}}
-                        <form action="" method="POST">
+                    <form action="{{ route('cart.placeOrder') }}" method="POST">
                         @csrf
-                        <button type="submit" class="px-6 py-2 bg-red-500 text-white rounded hover:bg-red-600">Clear Cart</button>
+                        <button type="submit" class="px-6 py-2 bg-green-500 text-white rounded hover:bg-green-600">Place Order</button>
                     </form>
                 </div>
             </div>
